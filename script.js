@@ -1,4 +1,60 @@
+import { createClient } from '@supabase/supabase-js'
+
+// --- Supabase Config ---
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
+
+// Validar configuración
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.error('Faltan variables de entorno VITE_SUPABASE_URL o VITE_SUPABASE_KEY');
+    // We can't use showToast here yet as it's not defined in this scope, but console error is enough for dev.
+}
+
+// Inicializar cliente
+// Inicializar cliente de forma segura
+let supabase = null;
+try {
+    if (!SUPABASE_URL || !SUPABASE_KEY) {
+        throw new Error('Variables de entorno faltantes');
+    }
+    supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+} catch (error) {
+    console.warn('Supabase no se pudo inicializar. El formulario de reserva no funcionará.', error);
+}
+
+// Redirect /admin to /admin/ (trailing slash fix for local dev)
+if (window.location.pathname === '/admin') {
+    window.location.href = '/admin/';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+
+    // --- Custom Toast Notifications ---
+    function showToast(message, type = 'success') {
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+
+        const icon = type === 'success' ? 'ph-check-circle' : 'ph-warning-circle';
+
+        toast.innerHTML = `
+            <i class="ph ${icon}"></i>
+            <span>${message}</span>
+        `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'fadeOut 0.5s ease-out forwards';
+            setTimeout(() => toast.remove(), 500);
+        }, 4000);
+    }
 
     // --- Advanced Animations ---
 
@@ -24,12 +80,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Hero Parallax Effect
     const heroSection = document.querySelector('.hero');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY < window.innerHeight) {
-            const speed = 0.5;
-            heroSection.style.backgroundPositionY = `${window.scrollY * speed}px`;
-        }
-    });
+    if (heroSection) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY < window.innerHeight) {
+                const speed = 0.5;
+                heroSection.style.backgroundPositionY = `${window.scrollY * speed}px`;
+            }
+        });
+    }
 
     // --- End Animations ---
 
@@ -46,12 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Mobile Menu Toggle (Simple implementation)
-    // Note: Since I didn't create a full overlay menu in HTML, 
-    // I'll add a simple alert or just console log for now as the CSS hides links.
-    // In a real scenario, we'd toggle a class on the nav-links.
-
-    // Let's make the mobile menu work by toggling a class
+    // Mobile Menu Toggle
     const mobileToggle = document.querySelector('.mobile-toggle');
     const navLinks = document.querySelector('.nav-links');
     const navbar = document.querySelector('.navbar');
@@ -86,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Intersection Observer for scroll animations
+    // Intersection Observer for scroll animations (Legacy/Secondary)
     const observerOptions = {
         threshold: 0.1
     };
@@ -101,9 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, observerOptions);
 
-    // Fade in text-elements
     const animatedElements = document.querySelectorAll('h2, .feature-box, .card, .step, .benefit-card');
-
     animatedElements.forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(20px)';
@@ -116,33 +167,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.querySelector('.close-modal');
     const bookingForm = document.getElementById('bookingForm');
 
-    // Open Modal elements (Select all buttons that should trigger the modal)
-    // We target links with href="#offer" AND the specific buttons
     const triggerButtons = document.querySelectorAll('a[href="#offer"], .btn-primary, .btn-outline');
 
     triggerButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
-            // If it's the specific specific "Reservar" action, open modal
-            // Ideally we check if it is a booking intent
+            if (btn.type === 'submit') return;
+
             if (btn.textContent.includes('RESERVA') || btn.textContent.includes('Reserva') || btn.getAttribute('href') === '#offer') {
                 e.preventDefault();
                 modal.classList.add('show');
-                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                document.body.style.overflow = 'hidden';
             }
         });
     });
 
-    // Close Modal
     function closeModal() {
-        modal.classList.remove('show');
-        document.body.style.overflow = 'auto';
+        if (modal) {
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
     }
 
     if (closeBtn) {
         closeBtn.addEventListener('click', closeModal);
     }
 
-    // Close if clicking outside
     window.addEventListener('click', (e) => {
         if (e.target == modal) {
             closeModal();
@@ -151,22 +200,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Handle Form Submission
     if (bookingForm) {
-        bookingForm.addEventListener('submit', (e) => {
+        bookingForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Simulate processing
             const btn = bookingForm.querySelector('button');
             const originalText = btn.textContent;
+
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const goal = document.getElementById('goal').value;
+
+            if (!name || !phone || !goal) {
+                showToast('Por favor completa todos los campos.', 'error');
+                return;
+            }
+
             btn.textContent = 'Procesando...';
             btn.disabled = true;
 
-            setTimeout(() => {
-                alert('¡Felicidades! Tu solicitud ha sido recibida. Te contactaremos en breve por WhatsApp para confirmar tu horario.');
+            try {
+                if (!supabase) {
+                    throw new Error('El sistema de reservas no está configurado correctamente. Contacta al administrador.');
+                }
+
+                // Insert into Supabase
+                const { data, error } = await supabase
+                    .from('leads')
+                    .insert([
+                        { name, phone, goal }
+                    ]);
+
+                if (error) throw error;
+
+                showToast('¡Felicidades! Tu solicitud ha sido recibida correctamente.', 'success');
                 closeModal();
                 bookingForm.reset();
+
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error: ' + (error.message || 'Intenta de nuevo'), 'error');
+            } finally {
                 btn.textContent = originalText;
                 btn.disabled = false;
-            }, 1500);
+            }
         });
     }
 
@@ -175,13 +251,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeIcon = themeToggleBtn ? themeToggleBtn.querySelector('i') : null;
     const logoImg = document.querySelector('.logo img');
 
-    // Check local storage for theme
     const currentTheme = localStorage.getItem('theme');
 
     if (currentTheme === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
         if (themeIcon) themeIcon.className = 'ph ph-moon';
-        if (logoImg) logoImg.src = 'assets/images/logo-light.png';
+        if (logoImg) logoImg.src = '/assets/images/logo-light.png';
     }
 
     if (themeToggleBtn) {
@@ -192,14 +267,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.documentElement.setAttribute('data-theme', 'dark');
                 localStorage.setItem('theme', 'dark');
                 themeIcon.className = 'ph ph-sun';
-                if (logoImg) logoImg.src = 'assets/images/logo.png';
+                if (logoImg) logoImg.src = '/assets/images/logo.png';
             } else {
                 document.documentElement.setAttribute('data-theme', 'light');
                 localStorage.setItem('theme', 'light');
                 themeIcon.className = 'ph ph-moon';
-                if (logoImg) logoImg.src = 'assets/images/logo-light.png';
+                if (logoImg) logoImg.src = '/assets/images/logo-light.png';
             }
         });
     }
-
 });

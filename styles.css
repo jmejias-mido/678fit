@@ -358,7 +358,7 @@ img {
     align-items: center;
     position: relative;
     padding-top: 80px;
-    background-image: url('assets/images/hero-bg.png');
+    background-image: url('/assets/images/hero-bg.png');
     background-size: cover;
     background-position: center;
 }
@@ -764,7 +764,7 @@ img {
 
     /* Mobile menu open state */
     .navbar.nav-open {
-        background: var(--color-bg);
+        background: #0f0f0f;
     }
 
     .navbar.nav-open .nav-links {
@@ -774,22 +774,105 @@ img {
         top: 100%;
         left: 0;
         width: 100%;
-        background: var(--color-bg);
+        background: rgba(15, 15, 15, 0.95);
+        /* Glassmorphism base */
+        backdrop-filter: blur(10px);
+        /* Blur effect */
+        -webkit-backdrop-filter: blur(10px);
         padding: 2rem;
         border-top: 1px solid var(--color-border);
+        border-bottom: 1px solid var(--color-border);
+
+        /* Animation setup */
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        /* pointer-events removed to fix click issue */
+    }
+
+    /* Combined rule for visibility and interaction */
+    .navbar.nav-open .nav-links {
+        pointer-events: auto;
+    }
+
+    /* We need to ensure the JS adds this class or we modify the selector. 
+       Let's simplify: just use .nav-open .nav-links and animate from 'display: none' is hard.
+       Better approach: Always display:flex but hide with opacity/transform, 
+       OR just animate blindly when class is present. 
+       Let's stick to the current JS structure but refine CSS.
+    */
+
+    .navbar .nav-links {
+        /* Mobile default hidden state override if needed, but 'display: none' is set in line 758 */
+    }
+
+    .navbar.nav-open .nav-links {
+        /* Override display:none from line 758 */
+        display: flex;
+        opacity: 0;
+        animation: menuSlideIn 0.3s forwards ease-out;
+    }
+
+    @keyframes menuSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .navbar.nav-open .nav-links a {
-        padding: 0.75rem 0;
+        padding: 1rem 0;
+        /* Larger tap target */
         color: var(--color-text);
+        font-size: 1.1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .navbar.nav-open .nav-links a:last-child {
+        border-bottom: none;
     }
 
     .navbar.nav-open .nav-links a:hover {
+        color: var(--color-primary);
+        padding-left: 10px;
+        /* Slight movement on hover */
+    }
+
+    /* Light Mode Mobile Menu Override */
+    [data-theme="light"] .navbar.nav-open {
+        background: #ffffff;
+    }
+
+    [data-theme="light"] .navbar.nav-open .nav-links {
+        background: rgba(255, 255, 255, 0.95);
+        border-top: 1px solid #e5e7eb;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    [data-theme="light"] .navbar.nav-open .nav-links a {
+        color: #111827;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    [data-theme="light"] .navbar.nav-open .nav-links a:hover {
         color: var(--color-primary);
     }
 }
 
 @media (max-width: 600px) {
+
+    /* Prevent iOS Zoom on focus */
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+
     .hero h1 {
         font-size: 2.2rem;
     }
@@ -824,6 +907,76 @@ img {
 .modal.show {
     display: flex;
     opacity: 1;
+}
+
+
+/* --- Toast Notifications --- */
+.toast-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.toast {
+    background: var(--color-bg-alt);
+    color: var(--color-text);
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-sm);
+    border-left: 4px solid var(--color-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 300px;
+    animation: slideIn 0.3s ease-out forwards;
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.toast.success {
+    border-color: var(--color-success);
+}
+
+.toast.error {
+    border-color: #ef4444;
+    /* Red-500 */
+}
+
+.toast i {
+    font-size: 1.5rem;
+}
+
+.toast.success i {
+    color: var(--color-success);
+}
+
+.toast.error i {
+    color: #ef4444;
+}
+
+@keyframes slideIn {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+}
+
+[data-theme="light"] .toast {
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--color-border);
+    border-left-width: 4px;
 }
 
 .modal-content {
@@ -990,7 +1143,7 @@ img {
 
 /* Parallax Helper */
 .hero {
-    background-attachment: fixed;
+    /* background-attachment: fixed; removed to fix mobile/render issues */
     /* Simple CSS Parallax fallback */
 }
 
