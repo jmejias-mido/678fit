@@ -149,24 +149,64 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Supabase Config ---
+    // TODO: Reemplaza con tus claves reales de Supabase
+    const SUPABASE_URL = 'https://yazwxmnunemzzmvgzvjj.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_4kEZ9HxhkwdAtqcSQflNVQ_qr3aIF6q';
+
+    // Inicializar cliente (verificamos si existe la librería para evitar errores si no cargó)
+    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
     // Handle Form Submission
     if (bookingForm) {
-        bookingForm.addEventListener('submit', (e) => {
+        bookingForm.addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            // Simulate processing
             const btn = bookingForm.querySelector('button');
             const originalText = btn.textContent;
+
+            // Get form values
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const goal = document.getElementById('goal').value;
+
+            // Basic Validation
+            if (!name || !phone || !goal) {
+                alert('Por favor completa todos los campos.');
+                return;
+            }
+
             btn.textContent = 'Procesando...';
             btn.disabled = true;
 
-            setTimeout(() => {
-                alert('¡Felicidades! Tu solicitud ha sido recibida. Te contactaremos en breve por WhatsApp para confirmar tu horario.');
+            try {
+                if (!supabase) throw new Error('Supabase client not initialized');
+
+                // Insert into Supabase
+                const { data, error } = await supabase
+                    .from('leads')
+                    .insert([
+                        { name, phone, goal }
+                    ]);
+
+                if (error) throw error;
+
+                // Success Feedback
+                alert('¡Felicidades! Tu solicitud ha sido recibida correctamente. Te contactaremos pronto.');
                 closeModal();
                 bookingForm.reset();
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Hubo un error al enviar tu solicitud. Por favor intenta de nuevo o contáctanos por WhatsApp.');
+                // Fallback for demo/testing without valid keys
+                if (error.message.includes('Supabase')) {
+                    console.log('Fallback: Datos que se hubieran enviado:', { name, phone, goal });
+                }
+            } finally {
                 btn.textContent = originalText;
                 btn.disabled = false;
-            }, 1500);
+            }
         });
     }
 
