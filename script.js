@@ -152,10 +152,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Supabase Config ---
     // TODO: Reemplaza con tus claves reales de Supabase
     const SUPABASE_URL = 'https://yazwxmnunemzzmvgzvjj.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_4kEZ9HxhkwdAtqcSQflNVQ_qr3aIF6q';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlhend4bW51bmVtenptdmd6dmpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxNjM4NDgsImV4cCI6MjA4MzczOTg0OH0.2HI3qsiapXzfKztwtV2eOZO4ReStu4OcRywAg3wlrH4';
 
-    // Inicializar cliente (verificamos si existe la librería para evitar errores si no cargó)
-    const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+    // Inicializar cliente con manejo de errores
+    let supabase = null;
+    try {
+        if (window.supabase) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('Supabase inicializado correctamente');
+        } else {
+            console.error('La librería de Supabase no se ha cargado.');
+        }
+    } catch (err) {
+        console.error('Error al inicializar Supabase:', err);
+        alert('Error de configuración: Revisa tus credenciales de Supabase en script.js');
+    }
 
     // Handle Form Submission
     if (bookingForm) {
