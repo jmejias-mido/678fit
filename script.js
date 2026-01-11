@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function closeMobileMenu() {
         if (navLinks) {
             navLinks.style.display = 'none';
-            navbar.style.background = 'rgba(15, 15, 15, 0.8)';
+            navbar.style.background = '';
         }
     }
 
