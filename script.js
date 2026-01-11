@@ -1,4 +1,46 @@
+import { createClient } from '@supabase/supabase-js'
+
+// --- Supabase Config ---
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
+
+// Validar configuración
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.error('Faltan variables de entorno VITE_SUPABASE_URL o VITE_SUPABASE_KEY');
+    // We can't use showToast here yet as it's not defined in this scope, but console error is enough for dev.
+}
+
+// Inicializar cliente
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
 document.addEventListener('DOMContentLoaded', () => {
+
+    // --- Custom Toast Notifications ---
+    function showToast(message, type = 'success') {
+        let container = document.querySelector('.toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+
+        const icon = type === 'success' ? 'ph-check-circle' : 'ph-warning-circle';
+
+        toast.innerHTML = `
+            <i class="ph ${icon}"></i>
+            <span>${message}</span>
+        `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'fadeOut 0.5s ease-out forwards';
+            setTimeout(() => toast.remove(), 500);
+        }, 4000);
+    }
 
     // --- Advanced Animations ---
 
@@ -24,12 +66,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 2. Hero Parallax Effect
     const heroSection = document.querySelector('.hero');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY < window.innerHeight) {
-            const speed = 0.5;
-            heroSection.style.backgroundPositionY = `${window.scrollY * speed}px`;
-        }
-    });
+    if (heroSection) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY < window.innerHeight) {
+                const speed = 0.5;
+                heroSection.style.backgroundPositionY = `${window.scrollY * speed}px`;
+            }
+        });
+    }
 
     // --- End Animations ---
 
@@ -46,12 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Mobile Menu Toggle (Simple implementation)
-    // Note: Since I didn't create a full overlay menu in HTML, 
-    // I'll add a simple alert or just console log for now as the CSS hides links.
-    // In a real scenario, we'd toggle a class on the nav-links.
-
-    // Let's make the mobile menu work by toggling a class
+    // Mobile Menu Toggle
     const mobileToggle = document.querySelector('.mobile-toggle');
     const navLinks = document.querySelector('.nav-links');
     const navbar = document.querySelector('.navbar');
@@ -86,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Intersection Observer for scroll animations
+    // Intersection Observer for scroll animations (Legacy/Secondary)
     const observerOptions = {
         threshold: 0.1
     };
@@ -101,9 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }, observerOptions);
 
-    // Fade in text-elements
     const animatedElements = document.querySelectorAll('h2, .feature-box, .card, .step, .benefit-card');
-
     animatedElements.forEach(el => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(20px)';
@@ -116,57 +153,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeBtn = document.querySelector('.close-modal');
     const bookingForm = document.getElementById('bookingForm');
 
-    // Open Modal elements (Select all buttons that should trigger the modal)
-    // We target links with href="#offer" AND the specific buttons
     const triggerButtons = document.querySelectorAll('a[href="#offer"], .btn-primary, .btn-outline');
 
     triggerButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
-            // If it's the specific specific "Reservar" action, open modal
-            // Ideally we check if it is a booking intent
+            if (btn.type === 'submit') return;
+
             if (btn.textContent.includes('RESERVA') || btn.textContent.includes('Reserva') || btn.getAttribute('href') === '#offer') {
                 e.preventDefault();
                 modal.classList.add('show');
-                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                document.body.style.overflow = 'hidden';
             }
         });
     });
 
-    // Close Modal
     function closeModal() {
-        modal.classList.remove('show');
-        document.body.style.overflow = 'auto';
+        if (modal) {
+            modal.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
     }
 
     if (closeBtn) {
         closeBtn.addEventListener('click', closeModal);
     }
 
-    // Close if clicking outside
     window.addEventListener('click', (e) => {
         if (e.target == modal) {
             closeModal();
         }
     });
-
-    // --- Supabase Config ---
-    // TODO: Reemplaza con tus claves reales de Supabase
-    const SUPABASE_URL = 'https://yazwxmnunemzzmvgzvjj.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inlhend4bW51bmVtenptdmd6dmpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxNjM4NDgsImV4cCI6MjA4MzczOTg0OH0.2HI3qsiapXzfKztwtV2eOZO4ReStu4OcRywAg3wlrH4';
-
-    // Inicializar cliente con manejo de errores
-    let supabase = null;
-    try {
-        if (window.supabase) {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            console.log('Supabase inicializado correctamente');
-        } else {
-            console.error('La librería de Supabase no se ha cargado.');
-        }
-    } catch (err) {
-        console.error('Error al inicializar Supabase:', err);
-        alert('Error de configuración: Revisa tus credenciales de Supabase en script.js');
-    }
 
     // Handle Form Submission
     if (bookingForm) {
@@ -176,14 +192,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = bookingForm.querySelector('button');
             const originalText = btn.textContent;
 
-            // Get form values
             const name = document.getElementById('name').value;
             const phone = document.getElementById('phone').value;
             const goal = document.getElementById('goal').value;
 
-            // Basic Validation
             if (!name || !phone || !goal) {
-                alert('Por favor completa todos los campos.');
+                showToast('Por favor completa todos los campos.', 'error');
                 return;
             }
 
@@ -191,8 +205,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.disabled = true;
 
             try {
-                if (!supabase) throw new Error('Supabase client not initialized');
-
                 // Insert into Supabase
                 const { data, error } = await supabase
                     .from('leads')
@@ -202,18 +214,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (error) throw error;
 
-                // Success Feedback
-                alert('¡Felicidades! Tu solicitud ha sido recibida correctamente. Te contactaremos pronto.');
+                showToast('¡Felicidades! Tu solicitud ha sido recibida correctamente.', 'success');
                 closeModal();
                 bookingForm.reset();
 
             } catch (error) {
                 console.error('Error:', error);
-                alert('Hubo un error al enviar tu solicitud. Por favor intenta de nuevo o contáctanos por WhatsApp.');
-                // Fallback for demo/testing without valid keys
-                if (error.message.includes('Supabase')) {
-                    console.log('Fallback: Datos que se hubieran enviado:', { name, phone, goal });
-                }
+                showToast('Error: ' + (error.message || 'Intenta de nuevo'), 'error');
             } finally {
                 btn.textContent = originalText;
                 btn.disabled = false;
@@ -226,7 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeIcon = themeToggleBtn ? themeToggleBtn.querySelector('i') : null;
     const logoImg = document.querySelector('.logo img');
 
-    // Check local storage for theme
     const currentTheme = localStorage.getItem('theme');
 
     if (currentTheme === 'light') {
@@ -252,5 +258,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-
 });
