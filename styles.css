@@ -1143,7 +1143,7 @@ img {
 
 /* Parallax Helper */
 .hero {
-    background-attachment: fixed;
+    /* background-attachment: fixed; removed to fix mobile/render issues */
     /* Simple CSS Parallax fallback */
 }
 
