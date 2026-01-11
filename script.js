@@ -11,7 +11,16 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
 }
 
 // Inicializar cliente
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+// Inicializar cliente de forma segura
+let supabase = null;
+try {
+    if (!SUPABASE_URL || !SUPABASE_KEY) {
+        throw new Error('Variables de entorno faltantes');
+    }
+    supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+} catch (error) {
+    console.warn('Supabase no se pudo inicializar. El formulario de reserva no funcionará.', error);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -205,6 +214,10 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.disabled = true;
 
             try {
+                if (!supabase) {
+                    throw new Error('El sistema de reservas no está configurado correctamente. Contacta al administrador.');
+                }
+
                 // Insert into Supabase
                 const { data, error } = await supabase
                     .from('leads')
