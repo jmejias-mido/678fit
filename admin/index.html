@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | 678FIT Admin</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Styles -->
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+        .admin-nav {
+            background: var(--color-bg-alt);
+            border-bottom: 1px solid var(--color-border);
+            padding: 1rem 0;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-container {
+            background: var(--color-bg-alt);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--color-border);
+            overflow-x: auto;
+            margin-top: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th,
+        td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.05);
+            font-weight: 600;
+            color: var(--color-primary-light);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-new {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--color-success);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .logout-btn:hover {
+            color: #ef4444;
+        }
+
+        .loading-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--color-text-muted);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="admin-nav">
+        <div class="container admin-header">
+            <div class="logo">
+                <img src="../assets/images/logo.png" alt="678FIT">
+                <span>Admin Portal</span>
+            </div>
+            <div class="logout-btn" id="logoutBtn">
+                <i class="ph ph-sign-out"></i> Cerrar Sesión
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 3rem;">
+            <div>
+                <h1>Leads & Reservas</h1>
+                <p class="text-muted">Gestiona las solicitudes de clases de prueba.</p>
+            </div>
+            <button class="btn btn-outline btn-sm" id="refreshBtn"><i class="ph ph-arrows-clockwise"></i>
+                Actualizar</button>
+        </div>
+
+        <!-- Filters Toolbar -->
+        <div class="filters-toolbar" style="display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
+            <div class="form-group" style="flex: 2; margin-bottom: 0;">
+                <input type="text" id="searchInput" placeholder="Buscar por nombre o teléfono...">
+            </div>
+            <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                <select id="goalFilter">
+                    <option value="">Todos los Objetivos</option>
+                    <option value="lose_weight">Perder Grasa</option>
+                    <option value="gain_muscle">Ganar Músculo</option>
+                    <option value="health">Salud y Movilidad</option>
+                    <option value="stress">Reducir Estrés</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Nombre</th>
+                        <th>Teléfono</th>
+                        <th>Objetivo</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody id="leadsTableBody">
+                    <tr>
+                        <td colspan="5" class="loading-state">Cargando datos...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script type="module" src="./script.js"></script>
+</body>
+
+</html>

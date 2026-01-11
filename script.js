@@ -22,6 +22,11 @@ try {
     console.warn('Supabase no se pudo inicializar. El formulario de reserva no funcionará.', error);
 }
 
+// Redirect /admin to /admin/ (trailing slash fix for local dev)
+if (window.location.pathname === '/admin') {
+    window.location.href = '/admin/';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- Custom Toast Notifications ---
