@@ -56,12 +56,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.querySelector('.nav-links');
     const navbar = document.querySelector('.navbar');
 
+    function closeMobileMenu() {
+        if (navLinks) {
+            navLinks.style.display = 'none';
+            navbar.style.background = 'rgba(15, 15, 15, 0.8)';
+        }
+    }
+
     if (mobileToggle && navLinks) {
         mobileToggle.addEventListener('click', () => {
-            // Quick fix to show menu on mobile
             if (navLinks.style.display === 'flex') {
-                navLinks.style.display = 'none';
-                navbar.style.background = 'rgba(15, 15, 15, 0.8)';
+                closeMobileMenu();
             } else {
                 navLinks.style.display = 'flex';
                 navLinks.style.flexDirection = 'column';
@@ -73,6 +78,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 navLinks.style.padding = '2rem';
                 navbar.style.background = '#0f0f0f';
             }
+        });
+
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 900) {
+                    closeMobileMenu();
+                }
+            });
         });
     }
 
