@@ -358,7 +358,7 @@ img {
     align-items: center;
     position: relative;
     padding-top: 80px;
-    background-image: url('assets/images/hero-bg.png');
+    background-image: url('/assets/images/hero-bg.png');
     background-size: cover;
     background-position: center;
 }

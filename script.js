@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentTheme === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
         if (themeIcon) themeIcon.className = 'ph ph-moon';
-        if (logoImg) logoImg.src = 'assets/images/logo-light.png';
+        if (logoImg) logoImg.src = '/assets/images/logo-light.png';
     }
 
     if (themeToggleBtn) {
@@ -262,12 +262,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.documentElement.setAttribute('data-theme', 'dark');
                 localStorage.setItem('theme', 'dark');
                 themeIcon.className = 'ph ph-sun';
-                if (logoImg) logoImg.src = 'assets/images/logo.png';
+                if (logoImg) logoImg.src = '/assets/images/logo.png';
             } else {
                 document.documentElement.setAttribute('data-theme', 'light');
                 localStorage.setItem('theme', 'light');
                 themeIcon.className = 'ph ph-moon';
-                if (logoImg) logoImg.src = 'assets/images/logo-light.png';
+                if (logoImg) logoImg.src = '/assets/images/logo-light.png';
             }
         });
     }
