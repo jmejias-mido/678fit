@@ -198,6 +198,7 @@ img {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 2rem;
 }
 
 .logo {
@@ -331,6 +332,7 @@ img {
 }
 
 .nav-links {
+    margin-left: auto;
     display: flex;
     gap: 2rem;
 }
