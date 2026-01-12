@@ -499,8 +499,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
             age--;
         }
-        if (age < 5) {
-            showToast('La edad mínima es 5 años', 'error');
+        if (age < 14) {
+            showToast('La edad mínima es 14 años', 'error');
             return false;
         }
 
