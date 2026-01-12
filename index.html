@@ -201,6 +201,243 @@
         </div>
     </section>
 
+    <!-- Plans Section -->
+    <section id="planes" class="section plans-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2>Elige tu <span class="text-primary">Plan Ideal</span></h2>
+                <p class="text-muted">Selecciona la duración que mejor se adapte a tus objetivos.</p>
+            </div>
+
+            <!-- Duration Tabs -->
+            <div class="plan-tabs">
+                <button class="plan-tab active" data-duration="mensual">Mensual</button>
+                <button class="plan-tab" data-duration="trimestral">Trimestral</button>
+                <button class="plan-tab" data-duration="cuatrimestral">Cuatrimestral</button>
+            </div>
+
+            <!-- Plans Grid (populated by JS) -->
+            <div class="plans-grid" id="plansGrid">
+                <!-- Plans will be loaded dynamically -->
+                <div class="loading-state text-center" style="grid-column: 1/-1; padding: 3rem;">
+                    <i class="ph ph-spinner" style="font-size: 2rem; animation: spin 1s linear infinite;"></i>
+                    <p>Cargando planes...</p>
+                </div>
+            </div>
+
+            <p class="text-center text-muted mt-5" style="font-size: 0.9rem;">
+                <i class="ph ph-info"></i> Todo es cobrado a tasa BCV Euro. Pago en Divisas, Cash, Zelle, Zinli,
+                Binance.
+            </p>
+        </div>
+    </section>
+
+    <!-- Registration Modal -->
+    <div id="registrationModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeRegistration">&times;</span>
+
+            <!-- Selected Plan Display -->
+            <div class="selected-plan-display">
+                <div>
+                    <span class="text-muted" style="font-size: 0.8rem;">Plan seleccionado</span>
+                    <div class="selected-plan-name" id="selectedPlanName">-</div>
+                </div>
+                <div class="selected-plan-price" id="selectedPlanPrice">-</div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="form-progress">
+                <div class="progress-step active" data-step="1">1</div>
+                <div class="progress-step" data-step="2">2</div>
+                <div class="progress-step" data-step="3">3</div>
+            </div>
+
+            <form id="registrationForm">
+                <!-- Step 1: Personal Info -->
+                <div class="form-step active" data-step="1">
+                    <h4 style="margin-bottom: 1.5rem;">Información Personal</h4>
+
+                    <div class="form-group">
+                        <label for="reg_fullname">Nombre Completo *</label>
+                        <input type="text" id="reg_fullname" required placeholder="Ej. María Pérez González">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Cédula/ID *</label>
+                            <div class="input-group">
+                                <select id="reg_id_type" required style="width: 70px; flex-shrink: 0;">
+                                    <option value="V">V</option>
+                                    <option value="E">E</option>
+                                    <option value="P">P</option>
+                                </select>
+                                <input type="text" id="reg_cedula" required placeholder="12345678" pattern="[0-9]{6,10}"
+                                    inputmode="numeric">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg_birthdate">Fecha de Nacimiento *</label>
+                            <input type="date" id="reg_birthdate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg_age">Edad</label>
+                            <input type="number" id="reg_age" readonly placeholder="Calculada automáticamente">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg_profession">Profesión</label>
+                            <input type="text" id="reg_profession" placeholder="Ej. Ingeniero">
+                        </div>
+                    </div>
+
+                    <div class="form-nav">
+                        <button type="button" class="btn btn-primary" id="toStep2">Siguiente <i
+                                class="ph ph-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Contact & Physical -->
+                <div class="form-step" data-step="2">
+                    <h4 style="margin-bottom: 1.5rem;">Contacto y Datos Físicos</h4>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Teléfono *</label>
+                            <div class="input-group">
+                                <select id="reg_phone_country" style="width: 90px; flex-shrink: 0;">
+                                    <option value="+58">🇻🇪 +58</option>
+                                    <option value="+57">🇨🇴 +57</option>
+                                    <option value="+1">🇺🇸 +1</option>
+                                    <option value="+34">🇪🇸 +34</option>
+                                </select>
+                                <input type="tel" id="reg_phone" required placeholder="4121234567"
+                                    pattern="[0-9]{10,11}" inputmode="tel">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Tel. Emergencia *</label>
+                            <div class="input-group">
+                                <select id="reg_emergency_country" style="width: 90px; flex-shrink: 0;">
+                                    <option value="+58">🇻🇪 +58</option>
+                                    <option value="+57">🇨🇴 +57</option>
+                                    <option value="+1">🇺🇸 +1</option>
+                                    <option value="+34">🇪🇸 +34</option>
+                                </select>
+                                <input type="tel" id="reg_emergency" required placeholder="4127654321"
+                                    pattern="[0-9]{10,11}" inputmode="tel">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg_address">Dirección Corta</label>
+                        <input type="text" id="reg_address" placeholder="Ej. Urb. Los Jardines, Calle 5">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg_height">Estatura (cm)</label>
+                            <input type="number" id="reg_height" placeholder="165">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg_weight">Peso (kg)</label>
+                            <input type="number" step="0.1" id="reg_weight" placeholder="65.5">
+                        </div>
+                    </div>
+
+                    <div class="form-nav">
+                        <button type="button" class="btn btn-back" id="backToStep1"><i class="ph ph-arrow-left"></i>
+                            Atrás</button>
+                        <button type="button" class="btn btn-primary" id="toStep3">Siguiente <i
+                                class="ph ph-arrow-right"></i></button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Medical & Photo -->
+                <div class="form-step" data-step="3">
+                    <h4 style="margin-bottom: 1.5rem;">Información Médica y Foto</h4>
+
+                    <div class="toggle-group">
+                        <span class="toggle-label">¿Posee seguro médico?</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="reg_insurance">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg_allergies">Alérgico a: (opcional)</label>
+                        <textarea id="reg_allergies" rows="2" placeholder="Ej. Penicilina, maní..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg_conditions">Padece de alguna condición: (opcional)</label>
+                        <textarea id="reg_conditions" rows="2" placeholder="Ej. Asma, hipertensión..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>¿Tiene biopolímeros?</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="biopolymers" id="bio_no" value="false" checked>
+                                <label for="bio_no">NO</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="biopolymers" id="bio_yes" value="true">
+                                <label for="bio_yes">SÍ</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Selfie (opcional)</label>
+                        <div class="selfie-upload" id="selfieUpload">
+                            <img class="selfie-preview" id="selfiePreview" alt="Preview">
+                            <i class="ph ph-camera"></i>
+                            <p>Toca para subir una foto</p>
+                            <input type="file" id="reg_selfie" accept="image/*" capture="user">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Método de Pago</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" name="payment" id="pay_cash" value="cash" checked>
+                                <label for="pay_cash">De Contado</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" name="payment" id="pay_installments" value="installments">
+                                <label for="pay_installments">En Cuotas</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-nav">
+                        <button type="button" class="btn btn-back" id="backToStep2"><i class="ph ph-arrow-left"></i>
+                            Atrás</button>
+                        <button type="submit" class="btn btn-primary">CONFIRMAR INSCRIPCIÓN</button>
+                    </div>
+                </div>
+
+                <!-- Success State -->
+                <div class="form-step registration-success" data-step="success">
+                    <i class="ph ph-check-circle"></i>
+                    <h3>¡Inscripción Exitosa!</h3>
+                    <p>Tu solicitud ha sido registrada. Guarda este código QR para tu check-in.</p>
+                    <div class="qr-code-display">
+                        <img id="qrCodeImage" src="" alt="Código QR">
+                    </div>
+                    <p class="qr-instructions">Presenta este código cuando visites el gym.</p>
+                    <button type="button" class="btn btn-primary" id="closeSuccess">Cerrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Testimonials -->
     <section id="stories" class="section testimonials">
         <div class="container">

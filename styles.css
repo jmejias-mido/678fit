@@ -904,7 +904,8 @@ img {
     transition: opacity 0.3s ease;
 }
 
-.modal.show {
+.modal.show,
+.modal.active {
     display: flex;
     opacity: 1;
 }
@@ -1044,7 +1045,8 @@ img {
 }
 
 .form-group input,
-.form-group select {
+.form-group select,
+.form-group textarea {
     width: 100%;
     padding: 1rem;
     border-radius: var(--radius-sm);
@@ -1057,15 +1059,53 @@ img {
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
+/* Fix calendar icon visibility in date inputs */
+.form-group input[type="date"] {
+    color-scheme: dark;
+}
+
 .form-group input:focus,
-.form-group select:focus {
+.form-group select:focus,
+.form-group textarea:focus {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
 }
 
 .form-group select {
     appearance: none;
     background-size: 1em;
+}
+
+/* Input Group (select + input combined) */
+.input-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+}
+
+.input-group select {
+    border-radius: var(--radius-sm);
+}
+
+.input-group input {
+    flex: 1;
+}
+
+/* Form validation styles */
+.form-group input:invalid:not(:placeholder-shown),
+.form-group input.error {
+    border-color: #ef4444;
+}
+
+.form-group .error-message {
+    color: #ef4444;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
 }
 
 /* Modal Light Mode Overrides */
@@ -1084,14 +1124,20 @@ img {
 }
 
 [data-theme="light"] .form-group input,
-[data-theme="light"] .form-group select {
+[data-theme="light"] .form-group select,
+[data-theme="light"] .form-group textarea {
     background: #f9fafb;
     border-color: #d1d5db;
     color: #111827;
 }
 
+[data-theme="light"] .form-group input[type="date"] {
+    color-scheme: light;
+}
+
 [data-theme="light"] .form-group input:focus,
-[data-theme="light"] .form-group select:focus {
+[data-theme="light"] .form-group select:focus,
+[data-theme="light"] .form-group textarea:focus {
     background: #fff;
     border-color: var(--color-primary);
 }
@@ -1148,3 +1194,537 @@ img {
 }
 
 /* Enhanced JS Parallax will override background-position */
+
+/* =============================================
+   PLANS SECTION - Membership Cards & Tabs
+   ============================================= */
+
+.plans-section {
+    background: linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-alt) 100%);
+}
+
+/* Duration Tabs */
+.plan-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+}
+
+.plan-tab {
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    border: 1px solid var(--color-border);
+    background: transparent;
+    color: var(--color-text-muted);
+    font-family: var(--font-main);
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.plan-tab:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary-light);
+}
+
+.plan-tab.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+/* Plans Grid */
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Plan Card Base */
+.plan-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+}
+
+.plan-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.plan-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Tier-specific gradients */
+.plan-card.tier-oro::before {
+    background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+}
+
+.plan-card.tier-oro .plan-name {
+    background: linear-gradient(90deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.plan-card.tier-plata::before {
+    background: linear-gradient(90deg, #C0C0C0, #E8E8E8, #C0C0C0);
+}
+
+.plan-card.tier-plata .plan-name {
+    background: linear-gradient(90deg, #C0C0C0, #E8E8E8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.plan-card.tier-bronce::before {
+    background: linear-gradient(90deg, #CD7F32, #8B4513, #CD7F32);
+}
+
+.plan-card.tier-bronce .plan-name {
+    background: linear-gradient(90deg, #CD7F32, #E6A86C);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.plan-card.tier-especial::before {
+    background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light), var(--color-primary));
+}
+
+.plan-card.tier-especial .plan-name {
+    color: var(--color-primary-light);
+}
+
+/* Plan Card Content */
+.plan-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.plan-name {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+}
+
+.plan-schedule {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.plan-includes {
+    color: var(--color-text);
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.plan-pricing {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.price-option {
+    text-align: center;
+}
+
+.price-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.25rem;
+}
+
+.price-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-text);
+}
+
+.price-value span {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--color-text-muted);
+}
+
+.plan-cta {
+    width: 100%;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    border: none;
+    background: var(--color-primary);
+    color: white;
+    font-family: var(--font-main);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.plan-cta:hover {
+    background: var(--color-primary-dark);
+    transform: scale(1.02);
+}
+
+/* Light Mode Adjustments */
+[data-theme="light"] .plan-card {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .plan-card:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* =============================================
+   REGISTRATION MODAL - Multi-Step Form
+   ============================================= */
+
+#registrationModal .modal-content {
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Progress Bar */
+.form-progress {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.form-progress::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--color-border);
+    transform: translateY(-50%);
+    z-index: 0;
+}
+
+.progress-step {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--color-bg);
+    border: 2px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.progress-step.active {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.progress-step.completed {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+
+/* Form Steps */
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Form Row (2 columns) */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 500px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Toggle Switch */
+.toggle-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+}
+
+.toggle-label {
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-border);
+    transition: 0.4s;
+    border-radius: 26px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+}
+
+input:checked+.toggle-slider {
+    background-color: var(--color-primary);
+}
+
+input:checked+.toggle-slider:before {
+    transform: translateX(24px);
+}
+
+/* Radio Group (Biopolymers) */
+.radio-group {
+    display: flex;
+    gap: 1rem;
+}
+
+.radio-option {
+    flex: 1;
+    position: relative;
+}
+
+.radio-option input {
+    position: absolute;
+    opacity: 0;
+}
+
+.radio-option label {
+    display: block;
+    padding: 1rem;
+    text-align: center;
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.radio-option input:checked+label {
+    border-color: var(--color-primary);
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--color-primary-light);
+}
+
+/* Selfie Upload */
+.selfie-upload {
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.selfie-upload:hover {
+    border-color: var(--color-primary);
+    background: rgba(139, 92, 246, 0.05);
+}
+
+.selfie-upload input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+}
+
+.selfie-upload i {
+    font-size: 3rem;
+    color: var(--color-text-muted);
+    margin-bottom: 1rem;
+}
+
+.selfie-upload p {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.selfie-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 1rem;
+    display: none;
+    border: 3px solid var(--color-primary);
+}
+
+.selfie-upload.has-image .selfie-preview {
+    display: block;
+}
+
+.selfie-upload.has-image i,
+.selfie-upload.has-image p {
+    display: none;
+}
+
+/* Selected Plan Display */
+.selected-plan-display {
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.selected-plan-name {
+    font-weight: 700;
+    color: var(--color-primary-light);
+}
+
+.selected-plan-price {
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+/* Form Navigation Buttons */
+.form-nav {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.form-nav button {
+    flex: 1;
+}
+
+.btn-back {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+}
+
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--color-text-muted);
+}
+
+/* Success State */
+.registration-success {
+    text-align: center;
+    padding: 2rem;
+}
+
+.registration-success i {
+    font-size: 5rem;
+    color: var(--color-success);
+    margin-bottom: 1.5rem;
+}
+
+.registration-success h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.registration-success p {
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+}
+
+.qr-code-display {
+    background: white;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+.qr-code-display img {
+    width: 200px;
+    height: 200px;
+}
+
+.qr-instructions {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
