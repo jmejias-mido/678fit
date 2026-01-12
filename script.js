@@ -282,6 +282,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
 
     let allPlans = [];
+    let displayPlans = []; // Plans to show in the grid
+    let registrationFeePlan = null; // The separated registration fee plan
     let selectedPlan = null;
     let currentDuration = 'mensual';
     let selfieFile = null;
@@ -302,6 +304,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (error) throw error;
             allPlans = data;
+
+            // Separate "Inscripción" from the rest
+            registrationFeePlan = allPlans.find(p => p.name.toLowerCase().includes('inscripción') || p.name.toLowerCase().includes('inscripcion'));
+            displayPlans = allPlans.filter(p => !p.name.toLowerCase().includes('inscripción') && !p.name.toLowerCase().includes('inscripcion'));
+
+            // Update UI info about registration fee if found
+            updateRegistrationFeeDisplay();
+
             renderPlans(currentDuration);
         } catch (error) {
             console.error('Error loading plans:', error);
@@ -312,12 +322,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function updateRegistrationFeeDisplay() {
+        const feeDisplay = document.getElementById('registrationFeeDisplay');
+        if (feeDisplay && registrationFeePlan) {
+            const price = registrationFeePlan.price_cash || registrationFeePlan.price_installments || 0;
+            feeDisplay.innerHTML = `<i class="ph ph-info"></i> Inscripción única: <strong>Ref ${price}</strong> (Pago único)`;
+            feeDisplay.style.display = 'inline-block';
+        }
+    }
+
     // Render plans for selected duration
     function renderPlans(duration) {
         const grid = document.getElementById('plansGrid');
         if (!grid) return;
 
-        const filteredPlans = allPlans.filter(p => p.duration_type === duration);
+        const filteredPlans = displayPlans.filter(p => p.duration_type === duration);
 
         if (filteredPlans.length === 0) {
             grid.innerHTML = '<p class="text-center text-muted" style="grid-column: 1/-1;">No hay planes disponibles para esta duración.</p>';
@@ -405,10 +424,47 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentStep = 1;
 
     function openRegistrationModal(planId, planName, planPrice) {
-        selectedPlan = { id: planId, name: planName, price: planPrice };
+        // Calculate totals
+        const planPriceNum = parseFloat(planPrice) || 0;
+        let registrationPriceNum = 0;
 
-        document.getElementById('selectedPlanName').textContent = `${planName} (${currentDuration})`;
-        document.getElementById('selectedPlanPrice').textContent = planPrice ? `Ref ${planPrice}` : 'Consultar';
+        if (registrationFeePlan) {
+            registrationPriceNum = parseFloat(registrationFeePlan.price_cash || registrationFeePlan.price_installments || 0);
+        }
+
+        const total = planPriceNum + registrationPriceNum;
+
+        // Store selected plan data + fee
+        selectedPlan = {
+            id: planId,
+            name: planName,
+            price: planPriceNum,
+            registrationFeeId: registrationFeePlan ? registrationFeePlan.id : null,
+            registrationFeePrice: registrationPriceNum
+        };
+
+        // Render Breakdown
+        const displayContainer = document.querySelector('.selected-plan-display');
+        if (displayContainer) {
+            displayContainer.innerHTML = `
+                <div style="width: 100%;">
+                    <div class="summary-row">
+                        <span>Plan ${planName} (${currentDuration})</span>
+                        <span>Ref ${planPriceNum}</span>
+                    </div>
+                    ${registrationPriceNum > 0 ? `
+                        <div class="summary-row text-muted" style="font-size: 0.9em;">
+                            <span>+ Inscripción Única</span>
+                            <span>Ref ${registrationPriceNum}</span>
+                        </div>
+                    ` : ''}
+                    <div class="summary-total">
+                        <span>Total a Pagar</span>
+                        <span class="total-price">Ref ${total}</span>
+                    </div>
+                </div>
+            `;
+        }
 
         // Reset form
         if (registrationForm) registrationForm.reset();
