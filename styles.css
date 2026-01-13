@@ -360,15 +360,54 @@ img {
     align-items: center;
     position: relative;
     padding-top: 80px;
-    background-image: url('/assets/images/hero-bg.png');
+    background-color: #0f0f0f;
+    /* Fallback color */
+    overflow: hidden;
+    /* Ensure video doesn't overflow */
+}
+
+.hero-bg-animate {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/assets/images/hero-cinematic.png');
     background-size: cover;
     background-position: center;
+    z-index: 0;
+    animation: kenBurns 20s ease-in-out infinite alternate;
+}
+
+@keyframes kenBurns {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.1);
+        background-position: center 60%;
+    }
+}
+
+.hero-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    /* If video is missing, we want to see the animated background. 
+       However, failed videos often show a black box. 
+       For now, we assume the user will upload a video or this sits behind. */
 }
 
 .hero-bg-overlay {
     position: absolute;
     inset: 0;
     background: linear-gradient(to right, rgba(15, 15, 15, 0.95) 0%, rgba(15, 15, 15, 0.7) 50%, rgba(15, 15, 15, 0.2) 100%);
+    z-index: 1;
 }
 
 .hero-content {
