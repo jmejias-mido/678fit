@@ -755,8 +755,31 @@ img {
     color: #aaa;
 }
 
-.cta-side {
-    text-align: right;
+/* Social Icons */
+.social-icons {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.social-icons a {
+    color: var(--color-text-muted);
+    font-size: 2rem;
+    transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+    color: var(--color-primary);
+    transform: translateY(-3px);
+}
+
+/* Map */
+.footer-map iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 250px;
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .copyright {
