@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS members (
     
     -- Información Personal
     full_name TEXT NOT NULL,
+    email TEXT,
     cedula TEXT NOT NULL UNIQUE,
     birth_date DATE NOT NULL,
     age INTEGER,
@@ -132,3 +133,21 @@ CREATE POLICY "Admin Manage Settings" ON settings FOR ALL TO authenticated USING
 
 -- Si prefieres hacerlo por SQL (requiere permisos):
 -- INSERT INTO storage.buckets (id, name, public) VALUES ('member-selfies', 'member-selfies', true);
+
+-- =============================================
+-- 4. TABLA DE LEADS (Prospectos de reserva)
+-- =============================================
+CREATE TABLE IF NOT EXISTS leads (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    goal TEXT,
+    status TEXT DEFAULT 'new'
+);
+
+-- RLS para Leads
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Insert Leads" ON leads FOR INSERT WITH CHECK (true);
+CREATE POLICY "Admin Read Leads" ON leads FOR SELECT TO authenticated USING (true);
+

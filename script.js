@@ -232,6 +232,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (error) throw error;
 
+                // --- Notification to Admin ---
+                supabase.functions.invoke('send-email', {
+                    body: {
+                        type: 'new_lead',
+                        payload: { name, phone, goal }
+                    }
+                }).then(({ data, error }) => {
+                    if (error) console.error('Error sending lead notification:', error);
+                });
+                // -----------------------------
+
                 showToast('¡Felicidades! Tu solicitud ha sido recibida correctamente.', 'success');
                 closeModal();
                 bookingForm.reset();
@@ -564,11 +575,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function validateStep2() {
+        const email = document.getElementById('reg_email').value.trim();
         const phone = document.getElementById('reg_phone').value.trim();
         const emergency = document.getElementById('reg_emergency').value.trim();
 
-        if (!phone || !emergency) {
-            showToast('Por favor completa los teléfonos', 'error');
+        if (!email || !phone || !emergency) {
+            showToast('Por favor completa el correo y teléfonos', 'error');
+            return false;
+        }
+
+        // Validate email
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            showToast('Ingresa un correo válido', 'error');
             return false;
         }
 
@@ -665,6 +683,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const memberData = {
                 full_name: document.getElementById('reg_fullname').value.trim(),
+                email: document.getElementById('reg_email').value.trim(),
                 cedula: `${idType}-${document.getElementById('reg_cedula').value.trim()}`,
                 birth_date: document.getElementById('reg_birthdate').value,
                 age: parseInt(document.getElementById('reg_age').value) || null,
@@ -697,6 +716,39 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show success step
             updateFormStep('success');
             document.querySelector('.form-step[data-step="success"]').classList.add('active');
+
+            // --- SEND EMAIL NOTIFICATIONS (Background) ---
+            const userEmail = document.getElementById('reg_email').value.trim();
+            // 1. Welcome Email to User
+            supabase.functions.invoke('send-email', {
+                body: {
+                    type: 'welcome',
+                    payload: {
+                        name: memberData.full_name,
+                        email: userEmail,
+                        qrCode: qrCode
+                    }
+                }
+            }).then(({ data, error }) => {
+                if (error) console.error('Error sending welcome email:', error);
+                else console.log('Welcome email sent:', data);
+            });
+
+            // 2. Notification to Admin
+            supabase.functions.invoke('send-email', {
+                body: {
+                    type: 'admin_notification',
+                    payload: {
+                        newMemberName: memberData.full_name,
+                        plan: selectedPlan.name,
+                        email: userEmail,
+                        phone: memberData.phone
+                    }
+                }
+            }).then(({ data, error }) => {
+                if (error) console.error('Error sending admin notification:', error);
+            });
+            // ---------------------------------------------
 
         } catch (error) {
             console.error('Error:', error);
