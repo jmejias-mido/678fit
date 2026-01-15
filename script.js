@@ -1,26 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from './auth.js';
 
-// --- Supabase Config ---
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
-
-// Validar configuración
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-    console.error('Faltan variables de entorno VITE_SUPABASE_URL o VITE_SUPABASE_KEY');
-    // We can't use showToast here yet as it's not defined in this scope, but console error is enough for dev.
-}
-
-// Inicializar cliente
-// Inicializar cliente de forma segura
-let supabase = null;
-try {
-    if (!SUPABASE_URL || !SUPABASE_KEY) {
-        throw new Error('Variables de entorno faltantes');
-    }
-    supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-} catch (error) {
-    console.warn('Supabase no se pudo inicializar. El formulario de reserva no funcionará.', error);
-}
+// Redirect /admin to /admin/ (trailing slash fix for local dev)
 
 // Redirect /admin to /admin/ (trailing slash fix for local dev)
 if (window.location.pathname === '/admin') {
@@ -579,8 +559,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const phone = document.getElementById('reg_phone').value.trim();
         const emergency = document.getElementById('reg_emergency').value.trim();
 
-        if (!email || !phone || !emergency) {
-            showToast('Por favor completa el correo y teléfonos', 'error');
+        const password = document.getElementById('reg_password').value.trim();
+
+        if (!email || !password || !phone || !emergency) {
+            showToast('Por favor completa todos los campos obligatorios', 'error');
+            return false;
+        }
+
+        // Validate basic password (min 6)
+        if (password.length < 6) {
+            showToast('La contraseña debe tener al menos 6 caracteres', 'error');
             return false;
         }
 
@@ -705,7 +693,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 qr_code: qrCode
             };
 
-            const { error } = await supabase.from('members').insert([memberData]);
+            // Create Auth User first
+            const password = document.getElementById('reg_password').value.trim();
+            
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email: document.getElementById('reg_email').value.trim(),
+                password: password,
+                options: {
+                    data: {
+                        full_name: document.getElementById('reg_fullname').value.trim()
+                    }
+                }
+            });
+
+            if (authError) throw authError;
+
+            // Wait a sec if needed (sometimes session takes a ms to settle, but usually okay)
+            const userId = authData.user?.id;
+
+            if (!userId) throw new Error('No se pudo crear el usuario. Intenta de nuevo.');
+
+            const { error } = await supabase.from('members').insert([{
+                ...memberData,
+                user_id: userId
+            }]);
 
             if (error) throw error;
 

@@ -58,7 +58,10 @@ CREATE TABLE IF NOT EXISTS members (
     expires_at TIMESTAMP WITH TIME ZONE,
     
     -- QR único
-    qr_code TEXT UNIQUE
+    qr_code TEXT UNIQUE,
+
+    -- Link a Supabase Auth
+    user_id UUID REFERENCES auth.users(id)
 );
 
 -- 3. TABLA DE CONFIGURACIÓN
@@ -119,6 +122,11 @@ CREATE POLICY "Public Insert Members" ON members FOR INSERT WITH CHECK (true);
 CREATE POLICY "Admin Read Members" ON members FOR SELECT TO authenticated USING (true);
 CREATE POLICY "Admin Update Members" ON members FOR UPDATE TO authenticated USING (true);
 CREATE POLICY "Admin Delete Members" ON members FOR DELETE TO authenticated USING (true);
+
+-- MEMBERS: Acceso propio
+CREATE POLICY "Users can view own profile" ON members FOR SELECT TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can update own profile" ON members FOR UPDATE TO authenticated USING (auth.uid() = user_id);
+CREATE POLICY "Users can insert own profile" ON members FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
 
 -- SETTINGS: Solo admin
 CREATE POLICY "Admin Manage Settings" ON settings FOR ALL TO authenticated USING (true) WITH CHECK (true);

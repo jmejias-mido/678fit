@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil - 678FIT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 100px auto 40px;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 900px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+                margin-top: 80px;
+            }
+        }
+
+        .profile-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            position: sticky;
+            top: 100px;
+        }
+
+        .profile-img-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary);
+            background: var(--bg-dark);
+        }
+
+        .profile-edit-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--primary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .profile-email {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .profile-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-active { background: rgba(0, 255, 0, 0.1); color: #00ff00; }
+        .badge-expired { background: rgba(255, 0, 0, 0.1); color: #ff4444; }
+        .badge-pending { background: rgba(255, 165, 0, 0.1); color: #ffa500; }
+
+        .content-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .editable-input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .editable-input:disabled {
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 0;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .plan-details {
+            background: var(--bg-dark);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .qr-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .qr-img {
+            width: 150px;
+            height: 150px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Tabs */
+        .dashboard-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .dash-tab {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .dash-tab.active {
+            background: rgba(227, 25, 55, 0.1);
+            color: var(--primary);
+        }
+
+        .dash-tab:hover:not(.active) {
+            color: var(--text-primary);
+        }
+
+        /* Payment Table */
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .payment-table th {
+            text-align: left;
+            padding: 12px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .payment-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        .status-completed { background: rgba(0, 255, 0, 0.1); color: #00ff00; }
+        .status-pending { background: rgba(255, 165, 0, 0.1); color: #ffa500; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar (Simplified) -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/" class="logo">
+                <img src="/assets/images/logo.png" alt="678FIT">
+                <span>678FIT</span>
+            </a>
+            <div class="nav-links" style="display: flex; align-items: center; gap: 20px;">
+                <div class="theme-toggle" id="theme-toggle" style="cursor: pointer; font-size: 1.5rem;">
+                    <i class="ph ph-sun"></i>
+                </div>
+                <a href="/">Volver al Inicio</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside>
+            <div class="profile-card" id="profile-loading">
+                <p>Cargando perfil...</p>
+            </div>
+            
+            <div class="profile-card" id="profile-content" style="display: none;">
+                <div class="profile-img-container">
+                    <img src="/assets/images/default-avatar.png" alt="Profile" class="profile-img" id="user-avatar">
+                   <!-- <div class="profile-edit-badge" title="Cambiar Foto"><i class="ph ph-camera"></i></div> -->
+                </div>
+                
+                <h2 class="profile-name" id="user-name">Usuario</h2>
+                <p class="profile-email" id="user-email">email@example.com</p>
+                <span class="profile-badge badge-pending" id="user-status">Cargando...</span>
+                
+                <div class="qr-section">
+                    <p style="font-size: 12px; margin-bottom: 5px;">TU CÓDIGO DE ACCESO</p>
+                    <img src="" alt="QR" class="qr-img" id="user-qr">
+                    <p style="font-size: 12px; color: var(--text-secondary);" id="user-code">CODE</p>
+                </div>
+
+                <button class="logout-btn" id="logout-btn">
+                    <i class="ph ph-sign-out"></i> Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main>
+            <div class="dashboard-tabs">
+                <button class="dash-tab active" data-tab="profile">Mi Perfil</button>
+                <button class="dash-tab" data-tab="payments">Historial de Pagos</button>
+            </div>
+
+            <!-- TAB: PROFILE -->
+            <div id="tab-profile">
+                <div class="content-card">
+                    <h3 class="section-title"><i class="ph ph-crown"></i> Mi Membresía</h3>
+                    <div class="plan-details" id="plan-details">
+                        <div>
+                            <p style="font-size: 14px; color: var(--text-secondary);">Plan Actual</p>
+                            <h4 style="font-size: 20px; color: var(--primary);" id="plan-name">-</h4>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="font-size: 14px; color: var(--text-secondary);">Vence</p>
+                            <h4 style="font-size: 18px;" id="plan-expiry">-</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="section-header">
+                        <h3 class="section-title"><i class="ph ph-user"></i> Datos Personales</h3>
+                        <button class="btn btn-outline btn-sm" id="edit-profile-btn">Editar</button>
+                        <button class="btn btn-primary btn-sm" id="save-profile-btn" style="display: none;">Guardar</button>
+                    </div>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Cédula</label>
+                            <input class="editable-input" id="info-cedula" value="-" disabled readonly>
+                        </div>
+                        <div class="info-item">
+                            <label>Teléfono</label>
+                            <input class="editable-input" id="info-phone" value="-" disabled>
+                        </div>
+                        <div class="info-item">
+                            <label>Dirección</label>
+                            <input class="editable-input" id="info-address" value="-" disabled>
+                        </div>
+                    </div>
+                    
+                    <div class="info-grid" style="margin-top: 20px;">
+                        <div class="info-item">
+                            <label>Fecha Nacimiento</label>
+                            <p id="info-dob" style="padding: 0; font-size: 16px; font-weight: 500;">-</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Alergias / Condiciones</label>
+                            <input class="editable-input" id="info-medical" value="-" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             <!-- TAB: PAYMENTS -->
+             <div id="tab-payments" style="display: none;">
+                <div class="content-card">
+                    <h3 class="section-title" style="margin-bottom: 20px;"><i class="ph ph-receipt"></i> Historial de Pagos</h3>
+                    
+                    <div style="overflow-x: auto;">
+                        <table class="payment-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Concepto</th>
+                                    <th>Monto</th>
+                                    <th>Método</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payments-list">
+                                <!-- Populated via JS -->
+                            </tbody>
+                        </table>
+                        <p id="no-payments" class="text-center text-muted" style="padding: 20px; display: none;">No hay pagos registrados.</p>
+                    </div>
+                </div>
+             </div>
+
+        </main>
+    </div>
+
+    <script type="module">
+        import { getProfile, updateProfile, getPaymentHistory, signOut, requireAuth } from './auth.js';
+        import { showToast, initTheme } from './utils.js';
+
+        let currentProfile = null;
+        
+        // Initialize Theme
+        initTheme();
+
+        async function loadDashboard() {
+            const user = await requireAuth();
+            currentProfile = await getProfile();
+
+            if (!currentProfile) {
+                showToast('No se encontró información de membresía.', 'error');
+                return;
+            }
+
+            renderProfile(currentProfile);
+            loadPayments();
+        }
+
+        function renderProfile(profile) {
+            // Render Sidebar
+            document.getElementById('profile-loading').style.display = 'none';
+            document.getElementById('profile-content').style.display = 'block';
+            
+            document.getElementById('user-name').textContent = profile.full_name;
+            document.getElementById('user-email').textContent = profile.email;
+            
+            if (profile.selfie_url) {
+                document.getElementById('user-avatar').src = profile.selfie_url;
+            }
+
+            // Status Badge
+            const statusEl = document.getElementById('user-status');
+            const status = profile.status;
+            statusEl.textContent = status === 'active' ? 'ACTIVO' : (status === 'expired' ? 'VENCIDO' : 'PENDIENTE');
+            statusEl.className = `profile-badge badge-${status}`;
+
+            // QR
+            if (profile.qr_code) {
+                document.getElementById('user-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(profile.qr_code)}`;
+                document.getElementById('user-code').textContent = profile.qr_code;
+            }
+
+            // Plan Info
+            if (profile.plans) {
+                document.getElementById('plan-name').textContent = profile.plans.name;
+            } else {
+                document.getElementById('plan-name').textContent = 'Sin Plan';
+            }
+
+            if (profile.expires_at) {
+                const date = new Date(profile.expires_at);
+                document.getElementById('plan-expiry').textContent = date.toLocaleDateString();
+            }
+
+            // Personal Info (Inputs)
+            document.getElementById('info-cedula').value = profile.cedula || '';
+            document.getElementById('info-phone').value = profile.phone || '';
+            document.getElementById('info-address').value = profile.address || '';
+            
+            const medical = [profile.allergies, profile.medical_conditions].filter(Boolean).join('. ');
+            document.getElementById('info-medical').value = medical || 'Ninguna';
+
+            document.getElementById('info-dob').textContent = new Date(profile.birth_date).toLocaleDateString();
+        }
+
+        async function loadPayments() {
+            const payments = await getPaymentHistory();
+            const tbody = document.getElementById('payments-list');
+            const noPayments = document.getElementById('no-payments');
+
+            tbody.innerHTML = '';
+
+            if (payments.length === 0) {
+                noPayments.style.display = 'block';
+                return;
+            }
+            
+            noPayments.style.display = 'none';
+
+            payments.forEach(p => {
+                const date = new Date(p.payment_date).toLocaleDateString();
+                const amount = p.currency === 'USD' ? `$${p.amount}` : `Ref ${p.amount}`;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${date}</td>
+                    <td>${p.plan_name || 'Membresía'}</td>
+                    <td>${amount}</td>
+                    <td style="text-transform: capitalize;">${p.method || '-'}</td>
+                    <td><span class="status-badge status-${p.status}">${p.status}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- Edit Profile Logic ---
+        const editBtn = document.getElementById('edit-profile-btn');
+        const saveBtn = document.getElementById('save-profile-btn');
+        const editableInputs = ['info-phone', 'info-address', 'info-medical'];
+
+        editBtn.addEventListener('click', () => {
+            editBtn.style.display = 'none';
+            saveBtn.style.display = 'inline-block';
+            
+            editableInputs.forEach(id => {
+                const input = document.getElementById(id);
+                input.disabled = false;
+                input.style.border = '1px solid var(--primary)';
+            });
+        });
+
+        saveBtn.addEventListener('click', async () => {
+            const updates = {
+                phone: document.getElementById('info-phone').value,
+                address: document.getElementById('info-address').value,
+                medical_conditions: document.getElementById('info-medical').value
+            };
+
+            saveBtn.textContent = 'Guardando...';
+            const { error } = await updateProfile(updates);
+
+            if (error) {
+                showToast('Error al guardar: ' + error.message, 'error');
+                saveBtn.textContent = 'Guardar';
+            } else {
+                // Success
+                saveBtn.style.display = 'none';
+                editBtn.style.display = 'inline-block';
+                saveBtn.textContent = 'Guardar';
+
+                editableInputs.forEach(id => {
+                    const input = document.getElementById(id);
+                    input.disabled = true;
+                    input.style.border = '1px solid transparent';
+                });
+                showToast('Perfil actualizado correctamente.', 'success');
+            }
+        });
+
+
+        // --- Tab Logic ---
+        document.querySelectorAll('.dash-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Buttons
+                document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Content
+                document.getElementById('tab-profile').style.display = 'none';
+                document.getElementById('tab-payments').style.display = 'none';
+                
+                const tabId = tab.dataset.tab;
+                document.getElementById(`tab-${tabId}`).style.display = 'block';
+            });
+        });
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            signOut();
+        });
+
+        loadDashboard();
+    </script>
+</body>
+</html>
