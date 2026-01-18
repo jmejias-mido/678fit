@@ -276,7 +276,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let displayPlans = []; // Plans to show in the grid
     let registrationFeePlan = null; // The separated registration fee plan
     let selectedPlan = null;
-    let currentDuration = 'mensual';
     let selfieFile = null;
 
     // Fetch plans from Supabase
@@ -303,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Update UI info about registration fee if found
             updateRegistrationFeeDisplay();
 
-            renderPlans(currentDuration);
+            renderPlans();
         } catch (error) {
             console.error('Error loading plans:', error);
             const grid = document.getElementById('plansGrid');
@@ -322,15 +321,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Render plans for selected duration
-    function renderPlans(duration) {
+    // Render plans
+    function renderPlans() {
         const grid = document.getElementById('plansGrid');
         if (!grid) return;
 
-        const filteredPlans = displayPlans.filter(p => p.duration_type === duration);
+        // Optionally filter by 'mensual' just in case, or show all valid plans
+        // Since we are removing others from DB, showing all remaining displayPlans is fine.
+        // But for safety during transition, let's filter or just use displayPlans if migration is done.
+        // Let's assume migration deletes them, so displayPlans is correct.
+        const filteredPlans = displayPlans.filter(p => p.duration_type === 'mensual'); 
 
         if (filteredPlans.length === 0) {
-            grid.innerHTML = '<p class="text-center text-muted" style="grid-column: 1/-1;">No hay planes disponibles para esta duración.</p>';
+            grid.innerHTML = '<p class="text-center text-muted" style="grid-column: 1/-1;">No hay planes disponibles.</p>';
             return;
         }
 
@@ -348,13 +351,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${plan.price_cash ? `
                             <div class="price-option">
                                 <div class="price-label">Contado</div>
-                                <div class="price-value">Ref ${plan.price_cash}</div>
+                                <div class="price-value">Ref ${plan.price_cash}/mes</div>
                             </div>
                         ` : ''}
                         ${plan.price_installments ? `
                             <div class="price-option">
                                 <div class="price-label">Cuotas</div>
-                                <div class="price-value">Ref ${plan.price_installments}</div>
+                                <div class="price-value">Ref ${plan.price_installments}/mes</div>
                             </div>
                         ` : ''}
                         ${!plan.price_cash && !plan.price_installments ? `
@@ -394,17 +397,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return '⚡';
     }
 
-    // Tab switching
-    const planTabs = document.querySelectorAll('.plan-tab');
-    planTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            planTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            currentDuration = tab.dataset.duration;
-            renderPlans(currentDuration);
-        });
-    });
-
     // =============================================
     // REGISTRATION MODAL
     // =============================================
@@ -438,9 +430,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const displayContainer = document.querySelector('.selected-plan-display');
         if (displayContainer) {
             displayContainer.innerHTML = `
-                <div style="width: 100%;">
                     <div class="summary-row">
-                        <span>Plan ${planName} (${currentDuration})</span>
+                        <span>Plan ${planName} (Mensual)</span>
                         <span>Ref ${planPriceNum}</span>
                     </div>
                     ${registrationPriceNum > 0 ? `
